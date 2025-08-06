@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Icon from 'components/AppIcon';
+import { chartOfAccounts } from '../../../lib/chartOfAccounts';
 
 const AddTransactionModal = ({ onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
@@ -25,19 +26,17 @@ const AddTransactionModal = ({ onClose, onSubmit }) => {
         const { accountService } = await import('../../../services/accountService');
         const result = await accountService?.getAccountsForDropdown();
         
-        if (result?.success) {
-          setAccounts(result?.accounts || []);
+        if (result?.success && result.accounts?.length > 0) {
+          setAccounts(result?.accounts);
         } else {
-          console.error('Failed to load accounts:', result?.error);
-          // Fallback to previous hardcoded accounts if service fails
-          setAccounts([
-            { code: '1', name: 'FFLDS', type: 'asset', label: '1 - FFLDS' },
-            { code: '200', name: 'Sales', type: 'revenue', label: '200 - Sales' },
-            { code: '400', name: 'Advertising', type: 'expense', label: '400 - Advertising' },
-            { code: '404', name: 'Bank Fees', type: 'expense', label: '404 - Bank Fees' },
-            { code: '610', name: 'Accounts Receivable', type: 'current_asset', label: '610 - Accounts Receivable' },
-            { code: '800', name: 'Accounts Payable', type: 'current_liability', label: '800 - Accounts Payable' }
-          ]);
+          console.error('Failed to load accounts, using fallback:', result?.error);
+          // Fallback to hardcoded chart of accounts if service fails or returns no accounts
+          const formattedAccounts = chartOfAccounts.map(acc => ({
+            ...acc,
+            value: acc.code,
+            label: `${acc.code} - ${acc.name}`
+          }));
+          setAccounts(formattedAccounts);
         }
       } catch (error) {
         console.error('Error loading accounts:', error);
