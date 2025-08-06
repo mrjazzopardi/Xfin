@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import Icon from 'components/AppIcon';
-import { accountService } from '../../../services/accountService';
 
 const RecordedTransactionsPanel = ({ 
   transactions, 
@@ -17,6 +16,7 @@ const RecordedTransactionsPanel = ({
   useEffect(() => {
     const loadAccounts = async () => {
       try {
+        const { accountService } = await import('../../../services/accountService');
         const result = await accountService?.getAccounts();
         if (result?.success) {
           const accountMap = {};

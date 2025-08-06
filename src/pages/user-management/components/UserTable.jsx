@@ -1,7 +1,6 @@
 import React from 'react';
 import Icon from 'components/AppIcon';
 import Image from 'components/AppImage';
-import { safeDeleteAccount } from '../../../services/accountService';
 
 const UserTable = ({
   users,
@@ -49,6 +48,7 @@ const UserTable = ({
 
     try {
       setLoading(true);
+      const { safeDeleteAccount } = await import('../../../services/accountService');
       const result = await safeDeleteAccount(userId);
 
       if (result?.success) {

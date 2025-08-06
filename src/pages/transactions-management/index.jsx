@@ -9,7 +9,6 @@ import TransactionFilters from './components/TransactionFilters';
 import BulkActions from './components/BulkActions';
 import AddTransactionModal from './components/AddTransactionModal';
 import { useAuth } from '../../contexts/AuthContext';
-import { accountService } from '../../services/accountService';
 import { importUtils } from '../../utils/importUtils';
 
 const TransactionsManagement = () => {
@@ -67,6 +66,7 @@ const TransactionsManagement = () => {
 
   const loadInitialData = async () => {
     try {
+      const { accountService } = await import('../../services/accountService');
       const [accountResult] = await Promise.all([
         accountService?.getAccounts({ active: true })
       ]);
@@ -87,7 +87,16 @@ const TransactionsManagement = () => {
       setError(null);
 
       const { transactionService } = await import('../../services/transactionService');
-      let result = await transactionService?.getTransactions(filters);
+
+      const cleanedFilters = { ...filters };
+      if (cleanedFilters.accountId === 'all') {
+        delete cleanedFilters.accountId;
+      }
+      if (cleanedFilters.clientId === 'all') {
+        delete cleanedFilters.clientId;
+      }
+
+      let result = await transactionService?.getTransactions(cleanedFilters);
 
       if (result?.success) {
         setTransactions(result?.transactions);

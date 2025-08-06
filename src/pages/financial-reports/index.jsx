@@ -7,7 +7,6 @@ import ReportViewer from './components/ReportViewer';
 import ReportFilters from './components/ReportFilters';
 import ExportOptions from './components/ExportOptions';
 import { useAuth } from '../../contexts/AuthContext';
-import { accountService } from '../../services/accountService';
 import { useNavigate } from 'react-router-dom';
 
 const FinancialReports = () => {
@@ -237,6 +236,7 @@ const FinancialReports = () => {
 
   const generateBalanceSheetReport = async () => {
     try {
+      const { accountService } = await import('../../services/accountService');
       let result = await accountService?.getTrialBalance(filters?.dateTo);
       
       if (!result?.success) {
@@ -313,6 +313,7 @@ const FinancialReports = () => {
 
   const generateTrialBalanceReport = async () => {
     try {
+      const { accountService } = await import('../../services/accountService');
       let result = await accountService?.getTrialBalance(filters?.dateTo);
       
       if (!result?.success) {

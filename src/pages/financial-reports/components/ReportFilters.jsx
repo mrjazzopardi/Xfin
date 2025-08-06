@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import Icon from 'components/AppIcon';
-import { accountService } from '../../../services/accountService';
 
 const ReportFilters = ({ filters, onChange }) => {
   const [accountOptions, setAccountOptions] = useState([]);
@@ -9,6 +8,7 @@ const ReportFilters = ({ filters, onChange }) => {
   useEffect(() => {
     const loadAccounts = async () => {
       try {
+        const { accountService } = await import('../../../services/accountService');
         const result = await accountService?.getAccounts();
         if (result?.success) {
           // Group accounts by type for better organization

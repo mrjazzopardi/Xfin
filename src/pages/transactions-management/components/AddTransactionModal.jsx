@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import Icon from 'components/AppIcon';
-import { accountService } from '../../../services/accountService';
 
 const AddTransactionModal = ({ onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
@@ -23,6 +22,7 @@ const AddTransactionModal = ({ onClose, onSubmit }) => {
     const loadAccounts = async () => {
       try {
         setLoading(true);
+        const { accountService } = await import('../../../services/accountService');
         const result = await accountService?.getAccountsForDropdown();
         
         if (result?.success) {
