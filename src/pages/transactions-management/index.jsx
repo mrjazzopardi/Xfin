@@ -9,7 +9,6 @@ import TransactionFilters from './components/TransactionFilters';
 import BulkActions from './components/BulkActions';
 import AddTransactionModal from './components/AddTransactionModal';
 import { useAuth } from '../../contexts/AuthContext';
-import { transactionService } from '../../services/transactionService';
 import { accountService } from '../../services/accountService';
 import { importUtils } from '../../utils/importUtils';
 
@@ -87,6 +86,7 @@ const TransactionsManagement = () => {
       setLoading(true);
       setError(null);
 
+      const { transactionService } = await import('../../services/transactionService');
       let result = await transactionService?.getTransactions(filters);
 
       if (result?.success) {
@@ -130,6 +130,7 @@ const TransactionsManagement = () => {
     try {
       setLoading(true);
       
+      const { transactionService } = await import('../../services/transactionService');
       let result = await transactionService?.createTransaction(transactionData);
       
       if (result?.success) {
@@ -150,6 +151,7 @@ const TransactionsManagement = () => {
     try {
       setLoading(true);
       
+      const { transactionService } = await import('../../services/transactionService');
       let result;
       
       switch (action) {
@@ -206,6 +208,7 @@ const TransactionsManagement = () => {
               let successCount = 0;
               const errors = [];
 
+              const { transactionService } = await import('../../services/transactionService');
               for (const txn of validTransactions) {
                 // Find matching account for the transaction
                 const account = accounts?.find(acc => 

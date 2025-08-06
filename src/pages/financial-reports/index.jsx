@@ -8,8 +8,6 @@ import ReportFilters from './components/ReportFilters';
 import ExportOptions from './components/ExportOptions';
 import { useAuth } from '../../contexts/AuthContext';
 import { accountService } from '../../services/accountService';
-import { transactionService } from '../../services/transactionService';
-import { dashboardService } from '../../services/dashboardService';
 import { useNavigate } from 'react-router-dom';
 
 const FinancialReports = () => {
@@ -168,6 +166,7 @@ const FinancialReports = () => {
 
   const generateProfitLossReport = async () => {
     try {
+      const { transactionService } = await import('../../services/transactionService');
       // Get revenue transactions
       const revenueResult = await transactionService?.getTransactions({
         type: 'income',
@@ -273,6 +272,7 @@ const FinancialReports = () => {
 
   const generateCashFlowReport = async () => {
     try {
+      const { dashboardService } = await import('../../services/dashboardService');
       let result = await dashboardService?.getCashFlowData(12); // Last 12 weeks
       
       if (!result?.success) {
@@ -334,6 +334,7 @@ const FinancialReports = () => {
 
   const generateGeneralLedgerReport = async () => {
     try {
+      const { transactionService } = await import('../../services/transactionService');
       let result = await transactionService?.getTransactions({
         dateFrom: filters?.dateFrom,
         dateTo: filters?.dateTo
@@ -384,6 +385,7 @@ const FinancialReports = () => {
 
   const generateAccountsReceivableReport = async () => {
     try {
+      const { transactionService } = await import('../../services/transactionService');
       // Get pending income transactions (unpaid invoices)
       let result = await transactionService?.getTransactions({
         type: 'income',

@@ -5,7 +5,6 @@ import Sidebar from 'components/ui/Sidebar';
 import Icon from 'components/AppIcon';
 import { LineChart, Line, AreaChart, Area, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useAuth } from '../../contexts/AuthContext';
-import { dashboardService } from '../../services/dashboardService';
 import { exportUtils } from '../../utils/exportUtils';
 
 // Components
@@ -50,6 +49,8 @@ const Dashboard = () => {
     try {
       setLoading(true);
       setError(null);
+
+      const { dashboardService } = await import('../../services/dashboardService');
 
       // Load all dashboard data
       const [kpiResult, revenueResult, expenseResult, cashFlowResult] = await Promise.all([
