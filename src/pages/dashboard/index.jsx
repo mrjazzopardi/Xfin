@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from 'components/ui/Header';
 import Sidebar from 'components/ui/Sidebar';
 import Icon from 'components/AppIcon';
 import { LineChart, Line, AreaChart, Area, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useAuth } from '../../contexts/AuthContext';
-import { exportUtils } from '../../utils/exportUtils';
+import html2canvas from 'html2canvas';
 
 // Components
 import KPICard from './components/KPICard';
@@ -16,6 +16,7 @@ import PendingTasks from './components/PendingTasks';
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, userProfile, signOut } = useAuth();
+  const dashboardRef = useRef(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   
   // Data states
@@ -118,44 +119,20 @@ const Dashboard = () => {
   };
 
   const handleDashboardExport = () => {
-    // Prepare dashboard summary data for export
-    const dashboardData = [
-      // KPI Data
-      ...getRoleBasedKPIs()?.map(kpi => ({
-        Type: 'KPI',
-        Metric: kpi?.title,
-        Value: kpi?.value,
-        Change: kpi?.change,
-        Period: 'Current'
-      })),
-      
-      // Revenue Data Summary
-      ...revenueData?.slice(-3)?.map(item => ({
-        Type: 'Revenue Trend',
-        Metric: `${item?.month} Revenue`,
-        Value: item?.revenue,
-        Period: item?.month
-      })),
-      
-      // Expense Data Summary
-      ...expenseData?.slice(0, 5)?.map(item => ({
-        Type: 'Expense Breakdown',
-        Metric: item?.name,
-        Value: item?.amount,
-        Period: 'Current Month'
-      })),
-      
-      // Cash Flow Summary
-      ...cashFlowData?.slice(-3)?.map(item => ({
-        Type: 'Cash Flow',
-        Metric: `${item?.date} Net Flow`,
-        Value: item?.inflow - item?.outflow,
-        Period: item?.date
-      }))
-    ];
-
-    const exportData = exportUtils?.generateReportData('dashboard-summary', dashboardData);
-    exportUtils?.exportToCSV(exportData?.data, `dashboard-summary-${new Date()?.toISOString()?.split('T')?.[0]}.csv`);
+    if (dashboardRef.current) {
+      html2canvas(dashboardRef.current, {
+        useCORS: true,
+        scale: 2,
+      }).then((canvas) => {
+        const image = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.href = image;
+        link.download = `dashboard-export-${new Date().toISOString().split('T')[0]}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      });
+    }
   };
 
   if (loading) {
@@ -182,7 +159,7 @@ const Dashboard = () => {
         onToggle={handleSidebarToggle}
         userRole={userRole}
       />
-      <main className={`
+      <main ref={dashboardRef} className={`
         pt-header-height nav-transition
         ${sidebarCollapsed ? 'lg:ml-sidebar-collapsed' : 'lg:ml-sidebar-width'}
       `}>
@@ -205,7 +182,8 @@ const Dashboard = () => {
                 </div>
                 <button 
                   onClick={handleDashboardExport}
-                  className="gradient-primary text-white px-6 py-2.5 rounded-xl hover:shadow-card-hover nav-transition flex items-center space-x-2 font-medium"
+                  disabled={loading}
+                  className="gradient-primary text-white px-6 py-2.5 rounded-xl hover:shadow-card-hover nav-transition flex items-center space-x-2 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Icon name="Download" size={16} color="white" />
                   <span>Export Report</span>
